@@ -1,125 +1,86 @@
 <?php
 
-class UsuariosController {
-    
-    // Método para buscar todos os usuários (GET /usuarios)
-    public function index() {
-        $database = new Database();
-        $db = $database->connect();
+class UsuarioService {
+    private $usuarioModel;
 
-        $usuario = new Usuario($db);
-        $result = $usuario->buscarTodos();
-        $num = $result->rowCount();
-
-        if($num > 0) {
-            $usuarios_arr = array();
-            while($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                extract($row);
-                $usuario_item = array(
-                    'id' => $id,
-                    'nome' => $nome,
-                    'email' => $email
-                );
-                array_push($usuarios_arr, $usuario_item);
-            }
-            JsonResponse::send($usuarios_arr);
-        } else {
-            JsonResponse::send(array('message' => 'Nenhum usuário encontrado.'), 404);
-        }
+    public function __construct(Usuario $usuarioModel) {
+        $this->usuarioModel = $usuarioModel;
     }
 
-    // Método para buscar um usuário por ID (GET /usuarios/buscar/1)
-    public function buscar($id) {
-        $database = new Database();
-        $db = $database->connect();
-        $usuario = new Usuario($db);
-        
-        $usuario->buscarPorId($id);
-
-        if($usuario->nome != null) {
-            $usuario_arr = array(
-                'id' => $usuario->id,
-                'nome' => $usuario->nome,
-                'email' => $usuario->email
-            );
-            JsonResponse::send($usuario_arr);
-        } else {
-            JsonResponse::send(array('message' => 'Usuário não encontrado.'), 404);
-        }
-    }
-    
-    // Método para criar um usuário (POST /usuarios/criar)
-    public function criar() {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            JsonResponse::send(['message' => 'Método não permitido'], 405);
-            return;
-        }
-
-        $database = new Database();
-        $db = $database->connect();
-        $usuario = new Usuario($db);
-
-        $data = json_decode(file_get_contents("php://input"));
-        
-        if(!$data || !isset($data->nome) || !isset($data->email) || !isset($data->senha)) {
-            JsonResponse::send(array('message' => 'Dados incompletos.'), 400);
-            return;
-        }
-
-        $usuario->nome = $data->nome;
-        $usuario->email = $data->email;
-        $usuario->senha = $data->senha;
-
-        if($usuario->criar()) {
-            JsonResponse::send(array('message' => 'Usuário criado com sucesso.'), 201);
-        } else {
-            JsonResponse::send(array('message' => 'Não foi possível criar o usuário.'), 500);
-        }
+    public function getTodos() {
+        return $this->usuarioModel->buscarTodos();
     }
 
-    // Método para atualizar um usuário (PUT /usuarios/atualizar/1)
-    public function atualizar($id) {
-        if ($_SERVER['REQUEST_METHOD'] !== 'PUT') {
-            JsonResponse::send(['message' => 'Método não permitido'], 405);
-            return;
+    public function getPorId($id) {
+        $usuario = $this->usuarioModel->buscarPorId($id);
+        if (!$usuario) {
+            // Lançar uma exceção é melhor para o controller capturar e tratar o erro
+            throw new Exception('Usuário não encontrado.', 404);
         }
-        
-        $database = new Database();
-        $db = $database->connect();
-        $usuario = new Usuario($db);
-        
-        $data = json_decode(file_get_contents("php://input"));
-        
-        if(!$data || !isset($data->nome) || !isset($data->email)) {
-             JsonResponse::send(array('message' => 'Dados incompletos para atualização.'), 400);
-            return;
-        }
-
-        $usuario->nome = $data->nome;
-        $usuario->email = $data->email;
-
-        if($usuario->atualizar($id)) {
-            JsonResponse::send(array('message' => 'Usuário atualizado com sucesso.'));
-        } else {
-            JsonResponse::send(array('message' => 'Não foi possível atualizar o usuário.'), 500);
-        }
+        return $usuario;
     }
 
-    // Método para deletar um usuário (DELETE /usuarios/deletar/1)
-    public function deletar($id) {
-        if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
-            JsonResponse::send(['message' => 'Método não permitido'], 405);
-            return;
+    public function criarUsuario($data) {
+        // 1. Validação dos dados de entrada
+        if (!isset($data->nome) || !isset($data->email) || !isset($data->senha)) {
+            throw new Exception('Dados incompletos. Nome, email e senha são obrigatórios.', 400); // Bad Request
         }
 
-        $database = new Database();
-        $db = $database->connect();
-        $usuario = new Usuario($db);
-
-        if($usuario->deletar($id)) {
-            JsonResponse::send(array('message' => 'Usuário deletado com sucesso.'));
-        } else {
-            JsonResponse::send(array('message' => 'Não foi possível deletar o usuário.'), 500);
+        // 2. Regra de Negócio: Verificar se o email já existe
+        if ($this->usuarioModel->buscarPorEmail($data->email)) {
+            throw new Exception('Este email já está em uso.', 409); // Conflict
         }
+        
+        // 3. Sanitização e Preparação dos dados
+        $dadosParaCriar = [
+            'nome' => htmlspecialchars(strip_tags($data->nome)),
+            'email' => htmlspecialchars(strip_tags($data->email)),
+            // 4. Regra de Negócio: Criptografia da senha
+            'senha' => password_hash($data->senha, PASSWORD_DEFAULT)
+        ];
+
+        // 5. Chamada ao Model para persistir os dados
+        $novoUsuarioId = $this->usuarioModel->criar($dadosParaCriar);
+
+        if (!$novoUsuarioId) {
+            throw new Exception('Não foi possível criar o usuário.', 500);
+        }
+        
+        return ['id' => $novoUsuarioId, 'message' => 'Usuário criado com sucesso.'];
+    }
+
+    public function atualizarUsuario($id, $data) {
+        // 1. Validação
+        if (!isset($data->nome) || !isset($data->email)) {
+            throw new Exception('Dados incompletos para atualização.', 400);
+        }
+
+        // 2. Regra de Negócio: Garantir que o usuário a ser atualizado existe
+        $this->getPorId($id); // Reutiliza o método que já lança exceção 404 se não encontrar
+
+        // 3. Sanitização
+        $dadosParaAtualizar = [
+            'nome' => htmlspecialchars(strip_tags($data->nome)),
+            'email' => htmlspecialchars(strip_tags($data->email))
+        ];
+
+        if (!$this->usuarioModel->atualizar($id, $dadosParaAtualizar)) {
+            // Pode significar que não houve erro, mas nenhum dado foi alterado.
+            // Dependendo da regra, você pode tratar isso de forma diferente.
+            // Aqui, vamos considerar um sucesso se não houver erro.
+        }
+        
+        return ['message' => 'Usuário atualizado com sucesso.'];
+    }
+
+    public function deletarUsuario($id) {
+        // Regra de Negócio: Garantir que o usuário existe antes de tentar deletar
+        $this->getPorId($id);
+
+        if (!$this->usuarioModel->deletar($id)) {
+            throw new Exception('Não foi possível deletar o usuário.', 500);
+        }
+
+        return ['message' => 'Usuário deletado com sucesso.'];
     }
 }

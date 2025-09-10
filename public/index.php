@@ -4,11 +4,12 @@
 spl_autoload_register(function ($className) {
     $file = str_replace('\\', '/', $className) . '.php';
     
-    // Procura nas pastas app/Core, app/Controllers, app/Models, config
+    // Procura nas pastas
     $paths = [
         '../app/Core/',
         '../app/Controllers/',
         '../app/Models/',
+        '../app/Services/', // <-- ADICIONADO
         '../config/'
     ];
 
