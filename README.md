@@ -5,11 +5,11 @@
 
 ## O que essa API faz, afinal? 
 Se liga nas funcionalidades que ela tem:
-* ✅ Listar todos os usuários: Pega todo mundo que tá cadastrado no banco de uma vez só.
-* 👤 Buscar um usuário específico: Encontra alguém pelo seu ID. Bem útil!
-* ➕ Criar um novo usuário: Cadastra uma pessoa nova no sistema, com direito a criptografia de senha e tudo mais pra garantir a segurança.
-* ✏️ Atualizar dados de um usuário: Permite editar informações como nome e email de alguém que já existe.
-* 🗑️ Deletar um usuário: Remove um usuário do banco de dados.
+*  Listar todos os usuários: Pega todo mundo que tá cadastrado no banco de uma vez só.
+*  Buscar um usuário específico: Encontra alguém pelo seu ID. Bem útil!
+*  Criar um novo usuário: Cadastra uma pessoa nova no sistema, com direito a criptografia de senha e tudo mais pra garantir a segurança.
+*  Atualizar dados de um usuário: Permite editar informações como nome e email de alguém que já existe.
+*  Deletar um usuário: Remove um usuário do banco de dados.
 
 Pra dar vida a esse projeto, usei algumas tecnologias bem conhecidas:
 * PHP: A linguagem principal por trás de toda a lógica do servidor.
