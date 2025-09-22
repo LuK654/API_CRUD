@@ -45,7 +45,7 @@ CREATE TABLE usuarios (
 4. **Inicie o Servidor!**
 Jogue a pasta do projeto dentro da pasta htdocs do seu XAMPP.
 Inicie os módulos **Apache** e **MySQL** no painel do XAMPP.
-Prontinho! Sua API já deve estar no ar, esperando suas requisições em http://localhost/API_CRUD/public/.
+Prontinho! Sua API já deve estar no ar, esperando suas requisições em http://localhost/api_crud/public/.
 
 ## Mapa da API (Endpoints) 
 Aqui estão os caminhos que você pode chamar (usando o Postman, por exemplo) pra interagir com a API:
@@ -74,4 +74,4 @@ DELETE | /usuarios/deletar/{id} | Deleta um usuário.
 }  
 
 
-É isso! Um projeto simples, mas que foi pra treinar e aplicar conceitos importantes de desenvolvimento backend e futuramente frontend.
+É isso! Um projeto simples, que foi feito pra treinar e aplicar conceitos importantes de desenvolvimento backend e futuramente frontend.
