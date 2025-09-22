@@ -10,7 +10,7 @@ class UsuariosController {
     }
 
     // GET /usuarios
-    public function buscarTodos() {
+    public function buscarGeral() {
         try {
             $usuarios = $this->usuarioService->getTodos();
             if (empty($usuarios)) {

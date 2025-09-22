@@ -20,7 +20,7 @@ class Router {
             $controller = new $controllerName($usuarioService);
             // --- Fim da Injeção de Dependência ---
 
-            $methodName = isset($url[1]) && method_exists($controller, $url[1]) ? $url[1] : 'index';
+            $methodName = isset($url[1]) && method_exists($controller, $url[1]) ? $url[1] : 'buscarGeral';
             
             $params = array_slice($url, 2);
 
