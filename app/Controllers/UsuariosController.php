@@ -2,124 +2,67 @@
 
 class UsuariosController {
     
-    // Método para buscar todos os usuários (GET /usuarios)
-    public function index() {
-        $database = new Database();
-        $db = $database->connect();
+    private $usuarioService;
 
-        $usuario = new Usuario($db);
-        $result = $usuario->buscarTodos();
-        $num = $result->rowCount();
+    // O serviço é injetado pelo construtor
+    public function __construct(UsuarioService $usuarioService) {
+        $this->usuarioService = $usuarioService;
+    }
 
-        if($num > 0) {
-            $usuarios_arr = array();
-            while($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                extract($row);
-                $usuario_item = array(
-                    'id' => $id,
-                    'nome' => $nome,
-                    'email' => $email
-                );
-                array_push($usuarios_arr, $usuario_item);
+    // GET /usuarios
+    public function buscarGeral() {
+        try {
+            $usuarios = $this->usuarioService->getTodos();
+            if (empty($usuarios)) {
+                JsonResponse::send(['message' => 'Nenhum usuário encontrado.'], 404);
+            } else {
+                JsonResponse::send($usuarios);
             }
-            JsonResponse::send($usuarios_arr);
-        } else {
-            JsonResponse::send(array('message' => 'Nenhum usuário encontrado.'), 404);
+        } catch (Exception $e) {
+            JsonResponse::send(['message' => $e->getMessage()], 500);
         }
     }
 
-    // Método para buscar um usuário por ID (GET /usuarios/buscar/1)
+    // GET /usuarios/buscar/{id}
     public function buscar($id) {
-        $database = new Database();
-        $db = $database->connect();
-        $usuario = new Usuario($db);
-        
-        $usuario->buscarPorId($id);
-
-        if($usuario->nome != null) {
-            $usuario_arr = array(
-                'id' => $usuario->id,
-                'nome' => $usuario->nome,
-                'email' => $usuario->email
-            );
-            JsonResponse::send($usuario_arr);
-        } else {
-            JsonResponse::send(array('message' => 'Usuário não encontrado.'), 404);
+        try {
+            $usuario = $this->usuarioService->getPorId($id);
+            JsonResponse::send($usuario);
+        } catch (Exception $e) {
+            // Usa o código da exceção que definimos no serviço (ex: 404)
+            JsonResponse::send(['message' => $e->getMessage()], $e->getCode() ?: 500);
         }
     }
     
-    // Método para criar um usuário (POST /usuarios/criar)
+    // POST /usuarios/criar
     public function criar() {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            JsonResponse::send(['message' => 'Método não permitido'], 405);
-            return;
-        }
-
-        $database = new Database();
-        $db = $database->connect();
-        $usuario = new Usuario($db);
-
         $data = json_decode(file_get_contents("php://input"));
-        
-        if(!$data || !isset($data->nome) || !isset($data->email) || !isset($data->senha)) {
-            JsonResponse::send(array('message' => 'Dados incompletos.'), 400);
-            return;
-        }
-
-        $usuario->nome = $data->nome;
-        $usuario->email = $data->email;
-        $usuario->senha = $data->senha;
-
-        if($usuario->criar()) {
-            JsonResponse::send(array('message' => 'Usuário criado com sucesso.'), 201);
-        } else {
-            JsonResponse::send(array('message' => 'Não foi possível criar o usuário.'), 500);
+        try {
+            $resultado = $this->usuarioService->criarUsuario($data);
+            JsonResponse::send($resultado, 201); // 201 Created
+        } catch (Exception $e) {
+            JsonResponse::send(['message' => $e->getMessage()], $e->getCode() ?: 500);
         }
     }
 
-    // Método para atualizar um usuário (PUT /usuarios/atualizar/1)
+    // PUT /usuarios/atualizar/{id}
     public function atualizar($id) {
-        if ($_SERVER['REQUEST_METHOD'] !== 'PUT') {
-            JsonResponse::send(['message' => 'Método não permitido'], 405);
-            return;
-        }
-        
-        $database = new Database();
-        $db = $database->connect();
-        $usuario = new Usuario($db);
-        
         $data = json_decode(file_get_contents("php://input"));
-        
-        if(!$data || !isset($data->nome) || !isset($data->email)) {
-             JsonResponse::send(array('message' => 'Dados incompletos para atualização.'), 400);
-            return;
-        }
-
-        $usuario->nome = $data->nome;
-        $usuario->email = $data->email;
-
-        if($usuario->atualizar($id)) {
-            JsonResponse::send(array('message' => 'Usuário atualizado com sucesso.'));
-        } else {
-            JsonResponse::send(array('message' => 'Não foi possível atualizar o usuário.'), 500);
+        try {
+            $resultado = $this->usuarioService->atualizarUsuario($id, $data);
+            JsonResponse::send($resultado);
+        } catch (Exception $e) {
+            JsonResponse::send(['message' => $e->getMessage()], $e->getCode() ?: 500);
         }
     }
 
-    // Método para deletar um usuário (DELETE /usuarios/deletar/1)
+    // DELETE /usuarios/deletar/{id}
     public function deletar($id) {
-        if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
-            JsonResponse::send(['message' => 'Método não permitido'], 405);
-            return;
-        }
-
-        $database = new Database();
-        $db = $database->connect();
-        $usuario = new Usuario($db);
-
-        if($usuario->deletar($id)) {
-            JsonResponse::send(array('message' => 'Usuário deletado com sucesso.'));
-        } else {
-            JsonResponse::send(array('message' => 'Não foi possível deletar o usuário.'), 500);
+        try {
+            $resultado = $this->usuarioService->deletarUsuario($id);
+            JsonResponse::send($resultado);
+        } catch (Exception $e) {
+            JsonResponse::send(['message' => $e->getMessage()], $e->getCode() ?: 500);
         }
     }
 }
