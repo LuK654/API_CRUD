@@ -4,12 +4,6 @@ class Usuario {
     private $conn;
     private $table = 'usuarios';
 
-    // Propriedades do Usuário
-    public $id;
-    public $nome;
-    public $email;
-    public $senha;
-
     public function __construct($db) {
         $this->conn = $db;
     }
@@ -19,65 +13,58 @@ class Usuario {
         $query = 'SELECT id, nome, email, data_criacao FROM ' . $this->table;
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
-        return $stmt;
+        return $stmt->fetchAll(PDO::FETCH_ASSOC); // Retorna um array diretamente
     }
 
     // Buscar um único usuário por ID
     public function buscarPorId($id) {
-        $query = 'SELECT id, nome, email, data_criacao FROM ' . $this->table . ' WHERE id = ? LIMIT 1';
+        $query = 'SELECT id, nome, email, data_criacao FROM ' . $this->table . ' WHERE id = :id LIMIT 1';
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $id);
+        $stmt->bindParam(':id', $id);
         $stmt->execute();
         
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if($row) {
-            $this->id = $row['id'];
-            $this->nome = $row['nome'];
-            $this->email = $row['email'];
-        }
+        return $stmt->fetch(PDO::FETCH_ASSOC); // Retorna o usuário ou false
     }
 
-    // Criar usuário
-    public function criar() {
+    // Buscar um único usuário por Email
+    public function buscarPorEmail($email) {
+        $query = 'SELECT id, nome, email FROM ' . $this->table . ' WHERE email = :email LIMIT 1';
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':email', $email);
+        $stmt->execute();
+        
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    // Criar usuário (agora recebe um array de dados)
+    public function criar(array $dados) {
         $query = 'INSERT INTO ' . $this->table . ' SET nome = :nome, email = :email, senha = :senha';
         $stmt = $this->conn->prepare($query);
 
-        // Limpando os dados (para segurança)
-        $this->nome = htmlspecialchars(strip_tags($this->nome));
-        $this->email = htmlspecialchars(strip_tags($this->email));
-        
-        // Criptografando a senha
-        $this->senha = password_hash($this->senha, PASSWORD_DEFAULT);
-
         // Vinculando os parâmetros
-        $stmt->bindParam(':nome', $this->nome);
-        $stmt->bindParam(':email', $this->email);
-        $stmt->bindParam(':senha', $this->senha);
+        $stmt->bindParam(':nome', $dados['nome']);
+        $stmt->bindParam(':email', $dados['email']);
+        $stmt->bindParam(':senha', $dados['senha']); // A senha já vem criptografada do Service
 
         if($stmt->execute()) {
-            return true;
+            return $this->conn->lastInsertId(); // Retorna o ID do usuário criado
         }
         return false;
     }
 
     // Atualizar usuário
-    public function atualizar($id) {
+    public function atualizar($id, array $dados) {
         $query = 'UPDATE ' . $this->table . ' SET nome = :nome, email = :email WHERE id = :id';
         $stmt = $this->conn->prepare($query);
 
-        $this->nome = htmlspecialchars(strip_tags($this->nome));
-        $this->email = htmlspecialchars(strip_tags($this->email));
-        $id = htmlspecialchars(strip_tags($id));
-
-        $stmt->bindParam(':nome', $this->nome);
-        $stmt->bindParam(':email', $this->email);
+        $stmt->bindParam(':nome', $dados['nome']);
+        $stmt->bindParam(':email', $dados['email']);
         $stmt->bindParam(':id', $id);
 
-        if($stmt->execute()) {
-            return true;
-        }
-        return false;
+        // execute() em um UPDATE retorna true em sucesso, mesmo que 0 linhas sejam afetadas
+        // rowCount() confirma se a linha foi de fato alterada.
+        $stmt->execute();
+        return $stmt->rowCount() > 0;
     }
     
     // Deletar usuário
@@ -85,13 +72,9 @@ class Usuario {
         $query = 'DELETE FROM ' . $this->table . ' WHERE id = :id';
         $stmt = $this->conn->prepare($query);
         
-        $id = htmlspecialchars(strip_tags($id));
-        
         $stmt->bindParam(':id', $id);
 
-        if($stmt->execute()) {
-            return true;
-        }
-        return false;
+        $stmt->execute();
+        return $stmt->rowCount() > 0; // Confirma que a linha foi deletada
     }
 }

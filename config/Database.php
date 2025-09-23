@@ -3,7 +3,7 @@
 class Database {
     // Parâmetros de conexão com o BD
     private $host = 'localhost';
-    private $db_name = 'hashflow_db';
+    private $db_name = 'api_crud_db';
     private $username = 'root';
     private $password = ''; // No XAMPP padrão, a senha é vazia
     private $conn;
