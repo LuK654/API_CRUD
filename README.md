@@ -1,6 +1,6 @@
-# E aí, tudo beleza? Bem-vindo(a) à Hashflow API! 
+# E aí, tudo beleza? Bem-vindo(a) ao meu projeto! 
 <br>Se você caiu aqui, provavelmente quer saber o que é esse projeto, né? Então, senta aí que eu te explico!</br>
-<br> **A Hashflow API** é um projeto de backend que eu criei para gerenciar usuários de forma simples e eficiente. Pensa nela como uma API RESTful completinha, com tudo que tem direito: criar, ler, atualizar e deletar usuários (o famoso CRUD).</br>
+<br> **API_CRUD** é um projeto de backend que eu criei para gerenciar usuários de forma simples e eficiente. Pensa nela como uma API RESTful completinha, com tudo que tem direito: criar, ler, atualizar e deletar usuários (o famoso CRUD).</br>
 <br> A ideia aqui era construir algo sólido, bem organizado e fácil de dar manutenção, seguindo boas práticas de desenvolvimento como a **arquitetura em 3 camadas (Controller-Service-Model)**. Foi um ótimo jeito de colocar a mão na massa e solidificar esses conceitos! </br>
 
 ## O que essa API faz, afinal? 
@@ -21,13 +21,13 @@ Pra dar vida a esse projeto, usei algumas tecnologias bem conhecidas:
 Quer testar na sua própria máquina? É bem tranquilo! Só seguir esses passos:
 1. Clone o Repositório
 Primeiro, você precisa baixar o projeto. Abre o terminal e manda ver:
-git clone [https://github.com/LuK654/Hashflow-api](https://github.com/LuK654/Hashflow-api)
-cd Hashflow-api
+git clone [https://github.com/LuK654/API_CRUD](https://github.com/LuK654/API_CRUD)
+cd API_CRUD
 
 2. Prepare o Banco de Dados
 Você vai precisar de um servidor local como o XAMPP, WAMP ou MAMP.
 * Abra o **phpMyAdmin**.
-* Crie um novo banco de dados com o nome hashflow_db.
+* Crie um novo banco de dados com o nome api_crud_db.
 * Vá na aba "SQL" e rode o script abaixo pra criar a tabela usuarios:
   
 CREATE TABLE usuarios (   
@@ -45,7 +45,7 @@ CREATE TABLE usuarios (
 4. **Inicie o Servidor!**
 Jogue a pasta do projeto dentro da pasta htdocs do seu XAMPP.
 Inicie os módulos **Apache** e **MySQL** no painel do XAMPP.
-Prontinho! Sua API já deve estar no ar, esperando suas requisições em http://localhost/hashflow-api/public/.
+Prontinho! Sua API já deve estar no ar, esperando suas requisições em http://localhost/api_crud/public/.
 
 ## Mapa da API (Endpoints) 
 Aqui estão os caminhos que você pode chamar (usando o Postman, por exemplo) pra interagir com a API:
@@ -74,4 +74,4 @@ DELETE | /usuarios/deletar/{id} | Deleta um usuário.
 }  
 
 
-É isso! Um projeto simples, mas que foi pra treinar e aplicar conceitos importantes de desenvolvimento backend e futuramente frontend.
+É isso! Um projeto simples, que foi feito pra treinar e aplicar conceitos importantes de desenvolvimento backend e futuramente frontend.
