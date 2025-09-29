@@ -38,13 +38,18 @@ class UsuariosController {
     public function criar() {
         $data = json_decode(file_get_contents("php://input"));
         try {
-            $resultado = $this->usuarioService->criarUsuario($data);
-            JsonResponse::send($resultado, 201); // 201 Created
+            // 1. Criamos o DTO usando os dados brutos. A validação acontece aqui dentro.
+            $createUserDTO = new CreateUserDTO($data);
+            
+            // 2. Passamos o objeto DTO (e não mais o $data genérico) para o serviço.
+            $resultado = $this->usuarioService->criarUsuario($createUserDTO);
+
+            JsonResponse::send($resultado, 201);
         } catch (Exception $e) {
             JsonResponse::send(['message' => $e->getMessage()], $e->getCode() ?: 500);
         }
     }
-
+    
     // PUT /usuarios/atualizar/{id}
     public function atualizar($id) {
         $data = json_decode(file_get_contents("php://input"));

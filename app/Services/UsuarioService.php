@@ -7,17 +7,28 @@ class UsuarioService {
         $this->usuarioModel = $usuarioModel;
     }
 
-    public function getTodos() {
-        return $this->usuarioModel->buscarTodos();
-    }
+public function getTodos() {
+    // 1. Buscamos a lista de usuários.
+    $usuariosArray = $this->usuarioModel->buscarTodos();
+
+    // 2. Usamos array_map para aplicar uma função a cada item da lista.
+    // A função que estamos aplicando é a criação de um novo UserResponseDTO.
+    return array_map(function($usuario) {
+        return new UserResponseDTO($usuario);
+    }, $usuariosArray);
+}
 
     public function getPorId($id) {
-        $usuario = $this->usuarioModel->buscarPorId($id);
-        if (!$usuario) {
-            // Lançar uma exceção é melhor para o controller capturar e tratar o erro
-            throw new Exception('Usuário não encontrado.', 404);
-        }
-        return $usuario;
+    // 1. Buscamos os dados crus do Model, como antes.
+    $usuarioArray = $this->usuarioModel->buscarPorId($id);
+
+    // 2. Verificamos se o usuário foi encontrado.
+    if (!$usuarioArray) {
+        throw new Exception('Usuário não encontrado.', 404);
+    }
+        // Em vez de retornar o array, criamos uma nova instância do DTO,
+        // passando o array de dados do usuário para o seu construtor.
+        return new UserResponseDTO($usuarioArray);
     }
 
     public function criarUsuario($data) {

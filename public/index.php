@@ -26,6 +26,7 @@ spl_autoload_register(function ($className) {
         '../app/Controllers/',
         '../app/Models/',
         '../app/Services/', // <-- ADICIONADO
+        '../app/DTO/', //Adicionado 26/09/2025.
         '../config/'
     ];
 
