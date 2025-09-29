@@ -1,5 +1,9 @@
-<<?php 
-    class CreateUserDTO {
+<?php 
+namespace App\DTO;
+
+use Exception;
+
+class CreateUserDTO {
         public readonly string $nome;
         public readonly string $email;
         public readonly string $senha;

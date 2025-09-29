@@ -1,6 +1,13 @@
+# Ativa o motor de reescrita de URLs do Apache
 RewriteEngine On
 
+# CONDIÇÃO 1: Se o que foi pedido na URL NÃO é um ficheiro que existe fisicamente...
 RewriteCond %{REQUEST_FILENAME} !-f
+# CONDIÇÃO 2: E se o que foi pedido na URL NÃO é uma pasta que existe fisicamente...
 RewriteCond %{REQUEST_FILENAME} !-d
 
-RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+# REGRA PARA SLIM: ...então, envia a requisição para o index.php.
+# O Slim irá ler o URL original a partir das variáveis do servidor.
+# Note que já não usamos `?url=$1`.
+RewriteRule ^ index.php [QSA,L]
+

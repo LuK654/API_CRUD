@@ -1,4 +1,5 @@
-<<?php 
+<?php
+    namespace App\DTO;
     class UserResponseDTO {
     /**
      * As propriedades públicas que a nossa API vai expor para o cliente.

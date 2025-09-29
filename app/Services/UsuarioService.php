@@ -1,4 +1,10 @@
 <?php
+namespace App\Services;
+
+use App\DTO\CreateUserDTO;
+use App\DTO\UserResponseDTO;
+use App\Models\Usuario;
+use Exception;
 
 class UsuarioService {
     private $usuarioModel;

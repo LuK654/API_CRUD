@@ -1,5 +1,6 @@
 <?php
 
+/*
 // --- INÍCIO DO CÓDIGO PARA HABILITAR O CORS ---
 // Permite requisições de qualquer origem. Para produção, você pode restringir a um domínio específico.
 header("Access-Control-Allow-Origin: *");
@@ -14,7 +15,46 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
     exit();
 }
-// --- FIM DO CÓDIGO CORS ---
+ --- FIM DO CÓDIGO CORS --- */
+
+ // Define o fuso horário para evitar avisos
+date_default_timezone_set('America/Sao_Paulo');
+
+// Usa o autoloader do Composer (muito mais poderoso que o nosso antigo)
+require __DIR__ . '/../vendor/autoload.php';
+
+
+use DI\Container;
+use Slim\Factory\AppFactory;
+
+// --- Injeção de Dependência ---
+$container = new Container();
+
+// Define as dependências da aplicação a partir de um ficheiro externo
+$dependencies = require __DIR__ . '/../app/dependencies.php';
+$dependencies($container);
+
+// Informa ao Slim para usar o nosso contentor de DI
+AppFactory::setContainer($container);
+
+// --- Criação da Aplicação Slim ---
+$app = AppFactory::create();
+
+// Adiciona middlewares essenciais do Slim
+$app->addRoutingMiddleware();
+$app->addErrorMiddleware(true, true, true); // (true, true, true) para ambiente de desenvolvimento
+
+
+// --- Definição das Rotas ---
+$routes = require __DIR__ . '/../app/routes.php';
+$routes($app);
+
+// --- Executa a Aplicação ---
+$app->run();
+
+
+/*
+---------------- Antigo Código -----------------------------------------------------------
 
 // Autoload para as nossas classes
 spl_autoload_register(function ($className) {
@@ -41,4 +81,4 @@ spl_autoload_register(function ($className) {
 // Instancia e executa o roteador
 $router = new Router();
 $router->run();
-
+*/
