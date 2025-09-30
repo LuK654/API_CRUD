@@ -22,6 +22,6 @@ return function (Container $container) {
     // AQUI ESTÁ A CORREÇÃO:
     // Regra para criar o UsuariosController (injeta o UsuarioService).
     // Agora o contentor de DI sabe como construir a cadeia completa de dependências.
-    $container->set(UsuariosController::class, fn(Container $c) => new UsuariosController($c->get(UsuarioService::class)));
+  //  $container->set(UsuariosController::class, fn(Container $c) => new UsuariosController($c->get(UsuarioService::class)));
 };
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teste API_CRUD</title>
+    <title>Teste da API Hashflow</title>
     <!-- Tailwind CSS via CDN para estilização rápida -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -86,8 +86,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- CONFIGURAÇÃO ---
-    // !!! IMPORTANTE: Verifique se esta URL corresponde ao seu ambiente local !!!
-    const API_BASE_URL = 'http://localhost/api_crud/public/'; // Ajuste se necessário
+    const API_BASE_URL = 'http://localhost/API_CRUD/public/';
 
     // --- ELEMENTOS DO DOM ---
     const userForm = document.getElementById('userForm');
@@ -103,10 +102,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- FUNÇÕES DA API ---
 
-    // 1. Buscar todos os usuários (GET)
+    // 1. Buscar todos os usuários (GET /usuarios)
     const fetchUsers = async () => {
         loadingDiv.style.display = 'block';
-        userList.innerHTML = ''; // Limpa a lista antes de carregar
+        userList.innerHTML = '';
         try {
             const response = await fetch(`${API_BASE_URL}usuarios`);
             if (!response.ok) {
@@ -115,19 +114,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const data = await response.json();
             renderUsers(data);
-            showStatus('Usuários carregados com sucesso!', 'success');
+            showStatus('Utilizadores carregados com sucesso!', 'success');
         } catch (error) {
-            showStatus(`Erro ao buscar usuários: ${error.message}`, 'error');
+            showStatus(`Erro ao buscar utilizadores: ${error.message}`, 'error');
             userList.innerHTML = `<tr><td colspan="4" class="text-center p-4 text-red-400">${error.message}</td></tr>`;
         } finally {
             loadingDiv.style.display = 'none';
         }
     };
     
-    // 2. Criar um novo usuário (POST)
+    // 2. Criar um novo usuário (POST /usuarios)
     const createUser = async (userData) => {
         try {
-            const response = await fetch(`${API_BASE_URL}usuarios/criar`, {
+            const response = await fetch(`${API_BASE_URL}usuarios`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(userData)
@@ -139,35 +138,35 @@ document.addEventListener('DOMContentLoaded', () => {
             resetForm();
             fetchUsers();
         } catch (error) {
-            showStatus(`Erro ao criar usuário: ${error.message}`, 'error');
+            showStatus(`Erro ao criar utilizador: ${error.message}`, 'error');
         }
     };
 
-    // 3. Atualizar um usuário (PUT)
+    // 3. Atualizar um usuário (PUT /usuarios/{id})
     const updateUser = async (id, userData) => {
         try {
-            const response = await fetch(`${API_BASE_URL}usuarios/atualizar/${id}`, {
+            const response = await fetch(`${API_BASE_URL}usuarios/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(userData)
             });
-             const result = await response.json();
+            const result = await response.json();
             if (!response.ok) throw new Error(result.message);
             
             showStatus(result.message, 'success');
             resetForm();
             fetchUsers();
         } catch (error) {
-            showStatus(`Erro ao atualizar usuário: ${error.message}`, 'error');
+            showStatus(`Erro ao atualizar utilizador: ${error.message}`, 'error');
         }
     };
 
-    // 4. Deletar um usuário (DELETE)
+    // 4. Deletar um usuário (DELETE /usuarios/{id})
     const deleteUser = async (id) => {
-        if (!confirm(`Tem certeza que deseja deletar o usuário com ID ${id}?`)) return;
+        if (!confirm(`Tem a certeza que deseja eliminar o utilizador com ID ${id}?`)) return;
         
         try {
-             const response = await fetch(`${API_BASE_URL}usuarios/deletar/${id}`, {
+            const response = await fetch(`${API_BASE_URL}usuarios/${id}`, {
                 method: 'DELETE'
             });
             const result = await response.json();
@@ -176,18 +175,16 @@ document.addEventListener('DOMContentLoaded', () => {
             showStatus(result.message, 'success');
             fetchUsers();
         } catch (error) {
-            showStatus(`Erro ao deletar usuário: ${error.message}`, 'error');
+            showStatus(`Erro ao eliminar utilizador: ${error.message}`, 'error');
         }
     };
 
     // --- FUNÇÕES AUXILIARES ---
-
-    // Renderiza a lista de usuários na tabela
     const renderUsers = (users) => {
-        userList.innerHTML = ''; // Limpa a lista
+        userList.innerHTML = '';
         if (!users || users.length === 0) {
-             userList.innerHTML = `<tr><td colspan="4" class="text-center p-4 text-gray-500">Nenhum usuário encontrado.</td></tr>`;
-             return;
+            userList.innerHTML = `<tr><td colspan="4" class="text-center p-4 text-gray-500">Nenhum utilizador encontrado.</td></tr>`;
+            return;
         }
 
         users.forEach(user => {
@@ -199,81 +196,78 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td class="p-2">${user.email}</td>
                 <td class="p-2 text-right">
                     <button class="edit-btn bg-blue-600 hover:bg-blue-500 text-white text-sm py-1 px-2 rounded-md" data-id="${user.id}" data-nome="${user.nome}" data-email="${user.email}">Editar</button>
-                    <button class="delete-btn bg-red-600 hover:bg-red-500 text-white text-sm py-1 px-2 rounded-md ml-2" data-id="${user.id}">Deletar</button>
+                    <button class="delete-btn bg-red-600 hover:bg-red-500 text-white text-sm py-1 px-2 rounded-md ml-2" data-id="${user.id}">Eliminar</button>
                 </td>
             `;
             userList.appendChild(tr);
         });
     };
     
-    // Mostra mensagem de status
     const showStatus = (message, type) => {
         statusMessage.textContent = message;
         statusMessage.className = `mb-8 text-center p-3 rounded-md ${type === 'success' ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}`;
         setTimeout(() => { statusMessage.textContent = ''; statusMessage.className = ''; }, 4000);
     };
 
-    // Reseta o formulário para o modo de criação
     const resetForm = () => {
         userForm.reset();
         userIdInput.value = '';
         senhaInput.required = true;
         senhaInput.disabled = false;
+        senhaInput.placeholder = "Obrigatória apenas na criação";
         cancelEditBtn.classList.add('hidden');
     };
 
-    // Preenche o formulário para edição
     const populateFormForEdit = (id, nome, email) => {
         userIdInput.value = id;
         nomeInput.value = nome;
         emailInput.value = email;
-        senhaInput.required = false; // Senha não é obrigatória na atualização
-        senhaInput.disabled = true; // Desabilitar para evitar atualização acidental
+        senhaInput.required = false;
+        senhaInput.disabled = true;
         senhaInput.placeholder = "A senha não pode ser editada";
         cancelEditBtn.classList.remove('hidden');
         document.getElementById('form-section').scrollIntoView({ behavior: 'smooth' });
     };
 
     // --- EVENT LISTENERS ---
+    if (userForm) {
+        userForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = userIdInput.value;
+            const userData = {
+                nome: nomeInput.value,
+                email: emailInput.value,
+            };
 
-    // Submit do formulário (Cria ou Atualiza)
-    userForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const id = userIdInput.value;
-        const userData = {
-            nome: nomeInput.value,
-            email: emailInput.value,
-        };
+            if (id) {
+                updateUser(id, userData);
+            } else {
+                userData.senha = senhaInput.value;
+                createUser(userData);
+            }
+        });
+    }
 
-        if (id) {
-            // Se tem ID, é uma atualização
-            updateUser(id, userData);
-        } else {
-            // Se não tem ID, é uma criação
-            userData.senha = senhaInput.value;
-            createUser(userData);
-        }
-    });
+    if (userList) {
+        userList.addEventListener('click', (e) => {
+            if (e.target.classList.contains('edit-btn')) {
+                const { id, nome, email } = e.target.dataset;
+                populateFormForEdit(id, nome, email);
+            }
+            if (e.target.classList.contains('delete-btn')) {
+                const { id } = e.target.dataset;
+                deleteUser(id);
+            }
+        });
+    }
 
-    // Cliques na lista de usuários (para Editar e Deletar)
-    userList.addEventListener('click', (e) => {
-        // Botão Editar
-        if (e.target.classList.contains('edit-btn')) {
-            const { id, nome, email } = e.target.dataset;
-            populateFormForEdit(id, nome, email);
-        }
-        // Botão Deletar
-        if (e.target.classList.contains('delete-btn')) {
-            const { id } = e.target.dataset;
-            deleteUser(id);
-        }
-    });
+    if (cancelEditBtn) {
+        cancelEditBtn.addEventListener('click', resetForm);
+    }
 
-    // Botão Cancelar Edição
-    cancelEditBtn.addEventListener('click', resetForm);
-
-    // Botão para recarregar a lista
-    reloadListBtn.addEventListener('click', fetchUsers);
+    if (reloadListBtn) {
+        reloadListBtn.addEventListener('click', fetchUsers);
+    }
     
     // --- CARGA INICIAL ---
     fetchUsers();
@@ -282,3 +276,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+

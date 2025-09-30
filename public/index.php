@@ -1,6 +1,6 @@
 <?php
 
-/*
+
 // --- INÍCIO DO CÓDIGO PARA HABILITAR O CORS ---
 // Permite requisições de qualquer origem. Para produção, você pode restringir a um domínio específico.
 header("Access-Control-Allow-Origin: *");
@@ -14,7 +14,7 @@ header("Access-Control-Allow-Headers: Content-Type, Authorization");
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
     exit();
-} */
+} 
 // --- FIM DO CÓDIGO CORS --- 
 
  // Define o fuso horário para evitar avisos

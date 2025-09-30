@@ -9,13 +9,13 @@ use Psr\Http\Message\ServerRequestInterface as Request; // Representa a requisi�
 class UsuariosController {
     // O controller tem uma única dependência: a camada de serviço.
     // Isto mantém o controller "magro" (thin), focando-se apenas no HTTP.
-    private $usuarioService;
+   // private $usuarioService;
 
     // O construtor implementa a Injeção de Dependência.
     // O contentor de DI (PHP-DI) que configurámos em `dependencies.php` é responsável
     // por criar uma instância de `UsuarioService` e passá-la para este construtor.
-    public function __construct(UsuarioService $usuarioService) {
-        $this->usuarioService = $usuarioService;
+    public function __construct(private UsuarioService $usuarioService) {
+       // $this->usuarioService = $usuarioService;
     }
 
     /**
