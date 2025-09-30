@@ -4,8 +4,10 @@ use App\Controllers\UsuariosController;
 use Slim\App;
 
 return function (App $app) {
-    echo $app->getBasePath();
-    $app->setBasePath('/api_crud');
+    $app->get('/hello', function ($request, $response) {
+        $response->getBody()->write('Hello, Slim is working!');
+        return $response;
+    });
     // Note como as URLs agora são limpas e RESTful!
     $app->get('/usuarios', [UsuariosController::class, 'buscarGeral']);
     $app->get('/usuarios/{id}', [UsuariosController::class, 'buscar']);

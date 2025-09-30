@@ -5,7 +5,6 @@ use App\Models\Usuario;
 use App\Services\UsuarioService;
 use Config\Database;
 use DI\Container;
-use PDO;
 
 return function (Container $container) {
     // Regra para criar a ligação à base de dados (PDO)

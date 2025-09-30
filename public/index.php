@@ -14,8 +14,8 @@ header("Access-Control-Allow-Headers: Content-Type, Authorization");
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
     exit();
-}
- --- FIM DO CÓDIGO CORS --- */
+} */
+// --- FIM DO CÓDIGO CORS --- 
 
  // Define o fuso horário para evitar avisos
 date_default_timezone_set('America/Sao_Paulo');
@@ -40,8 +40,15 @@ AppFactory::setContainer($container);
 // --- Criação da Aplicação Slim ---
 $app = AppFactory::create();
 
+// AQUI ESTÁ A MUDANÇA:
+// Diga explicitamente ao Slim que a sua aplicação vive dentro de /API_CRUD/public
+$app->setBasePath('/API_CRUD/public');
+
 // Adiciona middlewares essenciais do Slim
 $app->addRoutingMiddleware();
+// Adiciona o middleware que faz o parse do corpo da requisição.
+// É ele que vai ler o seu JSON e torná-lo disponível através de $request->getParsedBody().
+$app->addBodyParsingMiddleware();
 $app->addErrorMiddleware(true, true, true); // (true, true, true) para ambiente de desenvolvimento
 
 
